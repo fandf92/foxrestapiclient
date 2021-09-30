@@ -6,7 +6,14 @@ from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
 from devices.fox_base_device import FoxBaseDevice, UnsupportedDevice
-
+from .const import (
+    API_KEY,
+    CHANNELS,
+    HOST,
+    NAME,
+    TYPE,
+    UNIQUE_ID
+)
 def async_test(coro):
     def wrapper(*args, **kwargs):
         loop = asyncio.new_event_loop()
@@ -17,22 +24,19 @@ def async_test(coro):
     return wrapper
 
 class FoxBaseDeviceTest(unittest.TestCase):
-    host = "192.168.0.160"
-    api_key = "abf9e0f46b8f21d8ba5b86ba92"
-
     def test_init_base_device(self):
         try:
-            FoxBaseDevice("test", self.host, self.api_key, "qwert123", 6)
+            FoxBaseDevice(NAME, HOST, API_KEY, UNIQUE_ID, TYPE)
         except UnsupportedDevice:
             self.assertFalse(True)
         self.assertFalse(False)
 
     def test_equals(self):
-        self.assertEqual(FoxBaseDevice("test", self.host, self.api_key, "qwert123", 6).equals(
-            FoxBaseDevice("test", self.host, self.api_key, "qwert123", 6)), True)
+        self.assertEqual(FoxBaseDevice(NAME, HOST, API_KEY, UNIQUE_ID, TYPE).equals(
+            FoxBaseDevice(NAME, HOST, API_KEY, UNIQUE_ID, TYPE)), True)
 
     def test_get_device_info(self):
-        info = FoxBaseDevice("test", self.host, self.api_key, "qwert123", 6).get_device_info()
+        info = FoxBaseDevice(NAME, HOST, API_KEY, UNIQUE_ID, TYPE).get_device_info()
         if info != "":
             self.assertTrue(True)
         else:
@@ -41,7 +45,7 @@ class FoxBaseDeviceTest(unittest.TestCase):
     @async_test
     async def test_async_fetch_device_available_data(self):
         """If device is not available this test will be pass"""
-        dev = FoxBaseDevice("test", self.host, self.api_key, "qwert123", 6)
+        dev = FoxBaseDevice(NAME, HOST, API_KEY, UNIQUE_ID, TYPE)
         await dev.async_fetch_device_available_data()
 
 if __name__ == '__main__':
