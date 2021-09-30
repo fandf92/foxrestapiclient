@@ -8,6 +8,11 @@ API_METHOD_COMMON_GET_STATE = "get_state/"
 API_METHOD_COMMON_SET_STATE = "set_state/"
 API_METHOD_COMMON_GET_DEVICE_INFO = "get_device_info/"
 
+#Devices RestApi methods
+API_R1S1_GET_AC_PARAMETERS = "get_current_energy/"
+API_R1S1_GET_TOTAL_ENERGY_DATA = "get_total_energy/"
+
+
 #Device model
 DEVICE_MODEL_DIM1S2 = "DIM1S2"
 DEVICE_MODEL_GATE = "GATE"
