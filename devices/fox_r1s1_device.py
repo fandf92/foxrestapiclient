@@ -1,6 +1,5 @@
 """F&F Fox R1S1 device implementation."""
 
-import logging
 from .fox_base_device import DeviceData, FoxBaseDevice
 from connection.rest_api_client import RestApiClient
 from connection.rest_api_responses import RestApiBaseResponse
