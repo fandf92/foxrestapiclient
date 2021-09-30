@@ -13,6 +13,18 @@ from .const import (
     MANUFACTURER_NAME
 )
 
+class DeviceData:
+    """DeviceData holder. Used for simple object creation."""
+
+    def __init__(self, name: str, host: str, api_key: str, unique_id: str, type: int, channels: str = None):
+        """Init all required values."""
+        self.name = name
+        self.host = host
+        self.api_key = api_key
+        self.mac_addr = unique_id
+        self.type = type
+        self.channels = channels
+
 class UnsupportedDevice(Exception):
     """Custom exception for unsupported device."""
 
