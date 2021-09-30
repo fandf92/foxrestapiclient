@@ -12,6 +12,8 @@ API_METHOD_COMMON_GET_DEVICE_INFO = "get_device_info/"
 API_R1S1_GET_AC_PARAMETERS = "get_current_energy/"
 API_R1S1_GET_TOTAL_ENERGY_DATA = "get_total_energy/"
 
+API_DIMMABLE_SET_BRIGHTNESS = "set_brightness/"
+API_DIMMABLE_GET_BRIGHTNESS = "get_brightness/"
 
 #Device model
 DEVICE_MODEL_DIM1S2 = "DIM1S2"
