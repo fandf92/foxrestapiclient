@@ -78,7 +78,7 @@ class FoxDimmableDevice(FoxBaseDevice):
         device_response = await self.__device_api_client.async_get_brightness_value(params)
         if (device_response.status == API_RESPONSE_STATUS_FAIL or
             device_response.status == API_RESPONSE_STATUS_INVALID):
-            return [0]
+            return [0,0]
         values = []
         if device_response.brightness != -1:
             values.append(device_response.brightness)
