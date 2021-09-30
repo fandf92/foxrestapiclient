@@ -16,7 +16,7 @@ from .const import (
 class DeviceData:
     """DeviceData holder. Used for simple object creation."""
 
-    def __init__(self, name: str, host: str, api_key: str, unique_id: str, type: int, channels: str = None):
+    def __init__(self, name: str, host: str, api_key: str, unique_id: str, type: int, channels: list = None):
         """Init all required values."""
         self.name = name
         self.host = host
