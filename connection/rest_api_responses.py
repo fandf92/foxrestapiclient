@@ -37,3 +37,24 @@ class RestApiDeviceInfoResponse(RestApiBaseResponse):
         self.updater = updater
         self.device_friendly_name = device_friendly_name
         self.device_commercial_name = device_commercial_name
+
+class RestApiBrightnessResponse(RestApiBaseResponse):
+    """F&F Fox device brightness response."""
+
+    def __init__(self, channel_1_value: str = None,  channel_2_value: str = None, value: str = None,
+                 status: str = API_RESPONSE_STATUS_FAIL) -> None:
+        """Construct object with provided parameters."""
+        super().__init__(status)
+        self.brightness  = -1
+        self.channel_1_value = -1
+        self.channel_2_value = -1
+
+        try:
+            if value != None:
+                self.brightness = int(value)
+            if channel_1_value != None:
+                self.channel_1_value = int(channel_1_value)
+            if channel_2_value != None:
+                self.channel_2_value = int(channel_2_value)
+        except:
+            print("Error in parsing")
