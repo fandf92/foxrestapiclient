@@ -10,7 +10,8 @@ class FoxR2S2Device(FoxBaseDevice):
         """Initalize object."""
         super().__init__(device_data.name, device_data.host, device_data.api_key,
                         device_data.mac_addr, device_data.type)
-        self.channels = device_data.channels
+        #This device has two channels
+        self.channels = [1, 2]
         self.channel_one_state = False
         self.channel_two_state = False
 
