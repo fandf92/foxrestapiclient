@@ -15,6 +15,9 @@ API_R1S1_GET_TOTAL_ENERGY_DATA = "get_total_energy/"
 API_DIMMABLE_SET_BRIGHTNESS = "set_brightness/"
 API_DIMMABLE_GET_BRIGHTNESS = "get_brightness/"
 
+API_RGBW_SET_COLOR_HSV = "set_color_hsv/"
+API_RGBW_GET_COLOR_HSV = "get_color_hsv/"
+
 #Device model
 DEVICE_MODEL_DIM1S2 = "DIM1S2"
 DEVICE_MODEL_GATE = "GATE"
