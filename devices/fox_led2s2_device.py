@@ -11,7 +11,7 @@ class FoxLED2S2Device(FoxDimmableDevice):
         """Initialze object."""
         super().__init__(device_data)
         #This device has two channels
-        self.channels = device_data.channels
+        self.channels = [1, 2]
         self.channel_one_state = False
         self.channel_two_state = False
         #Store brighntess value for each channel
@@ -92,6 +92,8 @@ class FoxLED2S2Device(FoxDimmableDevice):
             self.channel_one_state, self.channel_two_state = states
         brigntess = await self.async_fetch_channel_brightness()
         if not isinstance(brigntess, list):
+            self.__reset_channels_brighntess()
+        elif isinstance(brigntess, list) and len(brigntess) < 2:
             self.__reset_channels_brighntess()
         else:
             self.channel_one_brightness, self.channel_two_brightness = brigntess
