@@ -18,6 +18,11 @@ API_DIMMABLE_GET_BRIGHTNESS = "get_brightness/"
 API_RGBW_SET_COLOR_HSV = "set_color_hsv/"
 API_RGBW_GET_COLOR_HSV = "get_color_hsv/"
 
+API_STR1S2_GET_OPEN_LEVEL = "get_open_level/"
+API_STR1S2_SET_OPEN_LEVEL = "set_open_level/"
+API_STR1S2_GET_TILT_LEVEL = "get_open_louvers_level/"
+API_STR1S2_SET_TILT_LEVEL = "set_open_louvers_level/"
+
 #Device model
 DEVICE_MODEL_DIM1S2 = "DIM1S2"
 DEVICE_MODEL_GATE = "GATE"
