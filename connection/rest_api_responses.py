@@ -28,7 +28,8 @@ class RestApiDeviceInfoResponse(RestApiBaseResponse):
     """F&F Fox device info response."""
 
     def __init__(self, device_name: str = "", firmware: str = "", hw: str = "",
-                updater: str = "", device_friendly_name: str = "", device_commercial_name: str = "",  status: str = API_RESPONSE_STATUS_FAIL) -> None:
+                updater: str = "", device_friendly_name: str = "", device_commercial_name: str = "",
+                status: str = API_RESPONSE_STATUS_FAIL, device_channels_name: list = None) -> None:
         """Construct object with provided parameters."""
         super().__init__(status)
         self.device_name = device_name
@@ -37,6 +38,7 @@ class RestApiDeviceInfoResponse(RestApiBaseResponse):
         self.updater = updater
         self.device_friendly_name = device_friendly_name
         self.device_commercial_name = device_commercial_name
+        self.device_channels_name = device_channels_name
 
 class RestApiBrightnessResponse(RestApiBaseResponse):
     """F&F Fox device brightness response."""
