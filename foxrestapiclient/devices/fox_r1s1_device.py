@@ -1,9 +1,9 @@
 """F&F Fox R1S1 device implementation."""
 
 from .fox_base_device import DeviceData, FoxBaseDevice
-from connection.rest_api_client import RestApiClient
-from connection.rest_api_responses import RestApiBaseResponse
-from connection.const import (
+from foxrestapiclient.connection.rest_api_client import RestApiClient
+from foxrestapiclient.connection.rest_api_responses import RestApiBaseResponse
+from foxrestapiclient.connection.const import (
     API_RESPONSE_STATUS_FAIL,
 )
 from .const import (

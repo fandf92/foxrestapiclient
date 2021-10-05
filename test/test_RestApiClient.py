@@ -5,9 +5,9 @@ import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
-from connection.rest_api_client import RestApiClient
-from connection.rest_api_responses import RestApiBaseResponse, RestApiDeviceStateResponse
-from connection.const import (
+from foxrestapiclient.connection.rest_api_client import RestApiClient
+from foxrestapiclient.connection.rest_api_responses import RestApiBaseResponse, RestApiDeviceStateResponse
+from foxrestapiclient.connection.const import (
     API_RESPONSE_STATUS_FAIL,
     API_RESPONSE_STATUS_OK,
     API_COMMON_DEVICE_OFF,

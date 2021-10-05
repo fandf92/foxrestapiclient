@@ -5,7 +5,7 @@ import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
-from devices.fox_base_device import FoxBaseDevice, UnsupportedDevice
+from foxrestapiclient.devices.fox_base_device import FoxBaseDevice, UnsupportedDevice
 from .const import (
     API_KEY,
     CHANNELS,

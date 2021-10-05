@@ -4,7 +4,7 @@ import unittest
 import sys
 from os import path, wait
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-from devices.fox_dim1s2_device import DeviceData, FoxDIM1S2Device
+from foxrestapiclient.devices.fox_dim1s2_device import DeviceData, FoxDIM1S2Device
 from .const import (
     API_KEY,
     CHANNELS,
