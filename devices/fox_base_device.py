@@ -1,6 +1,8 @@
 """F&F Fox base device implementation."""
 from __future__ import annotations
 import abc
+
+from aiohttp.client_exceptions import ClientConnectionError
 from connection.rest_api_client import RestApiClient
 from connection.rest_api_responses import RestApiDeviceInfoResponse
 from .const import (
@@ -56,6 +58,7 @@ class FoxBaseDevice(RestApiClient):
         """
         try:
             self.device_platform = DEVICE_PLATFORM[type]
+            self.register_response_error_hook(self.__track_available)
         except:
             raise UnsupportedDevice("Not supported device. Check type param.")
 
@@ -75,6 +78,13 @@ class FoxBaseDevice(RestApiClient):
         if self.mac_addr == foxBaseDevice.mac_addr:
             return True
         return False
+
+    def __track_available(self, error):
+        """Track device availability."""
+        if isinstance(error, ClientConnectionError):
+            self.is_available = False
+        if error is None:
+            self.is_available = True
 
     def get_device_info(self) -> str:
         """Get device info JSON string.
