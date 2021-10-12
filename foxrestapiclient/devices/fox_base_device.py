@@ -3,8 +3,8 @@ from __future__ import annotations
 import abc
 
 from aiohttp.client_exceptions import ClientConnectionError
-from connection.rest_api_client import RestApiClient
-from connection.rest_api_responses import RestApiDeviceInfoResponse
+from foxrestapiclient.connection.rest_api_client import RestApiClient
+from foxrestapiclient.connection.rest_api_responses import RestApiDeviceInfoResponse
 from .const import (
     API_RESPONSE_STATUS_FAIL,
     API_RESPONSE_STATUS_INVALID,
