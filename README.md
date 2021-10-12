@@ -4,7 +4,7 @@ This package contains simple RestAPI client written in Python for [F&F Filipowsk
 
 ### Requirements
 
-To obtain communication with device you should firstly configure it via F&F Fox mobile application available on [Android]() and [IOS]() (instructions included in app). Next grant access to remote control and enable RestAPI server with one of the following mode
+To obtain communication with device you should firstly configure it via F&F Fox mobile application available on [Android](https://play.google.com/store/apps/details?id=pl.com.fif.fox) and [IOS](https://apps.apple.com/pl/app/fox/id1580578557?l=pl) (instructions included in app). Next grant access to remote control and enable RestAPI server with one of the following mode
 
 - **Static** RestAPI client auth key
 
@@ -43,4 +43,4 @@ doubleSwitch = FoxR2S2Device(
 await doubleSwitch.async_set_device_state(True)
 ```
 
-More information about how to control device via API methods you can find on wiki page.
+More information about how to control device via API methods you can find on wiki [page](https://www.fif.com.pl/fox-wiki).
