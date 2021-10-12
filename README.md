@@ -43,4 +43,4 @@ doubleSwitch = FoxR2S2Device(
 await doubleSwitch.async_set_device_state(True)
 ```
 
-More information about how to control device via API methods you can find on wiki [page](https://www.fif.com.pl/fox-wiki).
+More information about how to control device via API methods you can find on wiki [page](https://github.com/fandf92/foxrestapiclient/wiki).
