@@ -14,9 +14,13 @@ setup(
     description="Connect to F&F Fox devices via RestAPI.",
     long_description=README,
     long_description_content_type="text/markdown",
-    author="F&F",
+    author="F&F Filipowski Sp. j.",
     author_email="t.waclawiak@fif.com.pl",
     license="MIT",
-    packages=find_packages(exclude=("test",)),
-    include_package_data=False
+    url = "https://github.com/fandf92/foxrestapiclient",
+    packages=find_packages(exclude=("test")),
+    include_package_data=True,
+    install_requires=[
+        'asyncio',
+    ],
 )
