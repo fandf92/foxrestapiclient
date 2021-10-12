@@ -1,6 +1,5 @@
 """F&F Fox DIM1S2 device implementation."""
 
-import logging
 from .fox_base_device import DeviceData
 from .fox_dimmable_device import FoxDimmableDevice
 

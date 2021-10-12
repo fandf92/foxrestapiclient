@@ -1,15 +1,12 @@
 """F&F Fox RGBW device implementation."""
 
 from __future__ import annotations
-import logging
 from .fox_base_device import DeviceData, FoxBaseDevice
 from foxrestapiclient.connection.rest_api_client import RestApiClient
 from foxrestapiclient.connection.rest_api_responses import RestApiBaseResponse
 from foxrestapiclient.connection.const import (
     API_RESPONSE_STATUS_FAIL,
     API_RESPONSE_STATUS_OK,
-    API_RESPONSE_STATUS_INVALID,
-    REQUEST_CHANNEL_KEY
 )
 from .const import (
     API_RGBW_SET_COLOR_HSV,

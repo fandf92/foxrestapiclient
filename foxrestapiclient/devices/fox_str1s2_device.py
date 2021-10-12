@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import logging
-from functools import *
 from .fox_base_device import DeviceData, FoxBaseDevice
 from foxrestapiclient.connection.rest_api_client import RestApiClient
 from foxrestapiclient.connection.rest_api_responses import RestApiBaseResponse

@@ -1,7 +1,7 @@
 """F&F Fox LED2S2 device implementation."""
 
 import logging
-from .fox_base_device import DeviceData, FoxBaseDevice
+from .fox_base_device import DeviceData
 from .fox_dimmable_device import FoxDimmableDevice
 
 class FoxLED2S2Device(FoxDimmableDevice):
