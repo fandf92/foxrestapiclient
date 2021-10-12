@@ -5,7 +5,7 @@ import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 
-from devices.fox_r2s2_device import DeviceData, FoxR2S2Device
+from foxrestapiclient.devices.fox_r2s2_device import DeviceData, FoxR2S2Device
 from .const import (
     API_KEY,
     CHANNELS,
