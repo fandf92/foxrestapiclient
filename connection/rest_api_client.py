@@ -18,7 +18,7 @@ from .rest_api_responses import (
     RestApiBaseResponse,
     RestApiDeviceInfoResponse,
     RestApiDeviceStateResponse,
-
+    RestApiError
 )
 import requests
 from requests.compat import urljoin
@@ -35,8 +35,18 @@ class RestApiClient:
         self._host = host
         self._api_key = api_key
         self._base_api_url = None
+        self.__response_error_hook = None
         self.__session_timeout =  aiohttp.ClientTimeout(total=None,
             sock_connect=API_CLIENT_CONNECTION_TIMEOUT, sock_read=API_CLIENT_CONNECTION_TIMEOUT)
+
+    def register_response_error_hook(self, response_hook):
+        """Register response error hook."""
+        self.__response_error_hook = response_hook
+
+    def unregister_response_error_hook(self):
+        """Unregister response error hook."""
+        self.__response_error_hook = None
+
     def get_base_api_url(self) -> str:
         """Create base_api_url if needed and return it."""
         if self._base_api_url is not None:
@@ -45,10 +55,6 @@ class RestApiClient:
         url_pattern = "http://{0}/{1}/"
         self._base_api_url = url_pattern.format(self._host, self._api_key)
         return self._base_api_url
-
-    def get_device_non_responding_response(self) -> RestApiBaseResponse:
-        """Set RestApiBaseResponse with status false to indicate that device is not available."""
-        return RestApiBaseResponse(API_RESPONSE_STATUS_FAIL)
 
     async def async_api_get_device_state(self, channel = None) -> RestApiDeviceStateResponse:
         """Get F&F Fox device state.
@@ -65,7 +71,9 @@ class RestApiClient:
         logging.info("Making call in async_api_get_device_state().")
         response_content = await self.async_make_api_call_get(API_COMMON_GET_STATE, params)
         if response_content is None:
-            return RestApiDeviceStateResponse(status=self.get_device_non_responding_response().status)
+            return RestApiDeviceStateResponse(status=API_RESPONSE_STATUS_FAIL)
+        if isinstance(response_content, RestApiError):
+            return RestApiDeviceStateResponse(API_RESPONSE_STATUS_FAIL, errorObj=response_content)
         return RestApiDeviceStateResponse(**json.loads(response_content))
 
     async def async_api_set_device_state(self, state, channel = None) -> RestApiBaseResponse:
@@ -86,7 +94,9 @@ class RestApiClient:
         logging.info("Making call in async_api_set_device_state() with params {0}.".format(params))
         response_content = await self.async_make_api_call_get(API_COMMON_SET_STATE, params)
         if response_content is None:
-            return self.get_device_non_responding_response()
+            return RestApiBaseResponse(API_RESPONSE_STATUS_FAIL)
+        if isinstance(response_content, RestApiError):
+            return RestApiBaseResponse(API_RESPONSE_STATUS_FAIL, errorObj=response_content)
         return RestApiBaseResponse(**json.loads(response_content))
 
     async def async_api_get_device_info(self) -> RestApiDeviceInfoResponse:
@@ -98,7 +108,9 @@ class RestApiClient:
         logging.info("Making call in async_api_get_device_info().")
         response_content = await self.async_make_api_call_get(API_COMMON_GET_DEVICE_INFO)
         if response_content is None:
-            return RestApiDeviceInfoResponse(status=self.get_device_non_responding_response().status)
+            return RestApiDeviceInfoResponse(status=API_RESPONSE_STATUS_FAIL)
+        if isinstance(response_content, RestApiError):
+            return RestApiDeviceInfoResponse(status=API_RESPONSE_STATUS_FAIL, errorObj=response_content)
         return RestApiDeviceInfoResponse(**json.loads(response_content))
 
     async def async_make_api_call_get(self, method: str, query_params = None):
@@ -122,6 +134,14 @@ class RestApiClient:
                     return response
         except aiohttp.ClientConnectionError as e:
             logging.error(e)
+            self.__invoke_response_error_hook(e)
+            return RestApiError(e)
         except requests.exceptions.RequestException as e:
             logging.error(e)
+            self.__invoke_response_error_hook(e)
         return None
+
+    def __invoke_response_error_hook(self, e):
+        """Invoke response error hook if registered."""
+        if self.__response_error_hook != None:
+                self.__response_error_hook(e)
