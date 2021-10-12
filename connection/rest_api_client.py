@@ -131,11 +131,11 @@ class RestApiClient:
                 async with session.get(urljoin(self.get_base_api_url(), method), params=query_params) as resp:
                     response = await resp.read()
                     logging.info("Received RAW response {0}".format(response))
+                    self.__invoke_response_error_hook(None) #Raise reponse_error_hook with None errors.
                     return response
         except aiohttp.ClientConnectionError as e:
             logging.error(e)
             self.__invoke_response_error_hook(e)
-            return RestApiError(e)
         except requests.exceptions.RequestException as e:
             logging.error(e)
             self.__invoke_response_error_hook(e)
