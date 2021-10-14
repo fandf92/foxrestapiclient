@@ -18,12 +18,12 @@ from .const import (
 class DeviceData:
     """DeviceData holder. Used for simple object creation."""
 
-    def __init__(self, name: str, host: str, api_key: str, unique_id: str, type: int, channels: list = None):
+    def __init__(self, name: str, host: str, api_key: str, mac_addr: str, type: int, channels: list = None):
         """Init all required values."""
         self.name = name
         self.host = host
         self.api_key = api_key
-        self.mac_addr = unique_id
+        self.mac_addr = mac_addr
         self.type = type
         self.channels = channels
 
