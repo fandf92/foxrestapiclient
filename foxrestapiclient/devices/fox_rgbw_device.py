@@ -138,9 +138,5 @@ class FoxRGBWDevice(FoxBaseDevice):
 
     async def async_fetch_update(self):
         """Fetch all available data from device."""
-        states = await self.async_fetch_channel_state()
-        if states != []:
-            self._state = states[0]
-        else:
-            self._state = False
+        self._state = await self.async_fetch_channel_state()
         await self.async_fetch_color_hsv()
