@@ -92,17 +92,17 @@ class FoxDimmableDevice(FoxBaseDevice):
         """Set brightness value on device.
 
         Keyword arguments:
-        brightness -- value from range <0-100>
+        brightness -- value from range <0-255>
         channel -- value from range <1-2> or None.
         """
-        if brightness < 0 or brightness > 100:
+        if brightness < 0 or brightness > 255:
             logging.warning("Brightness passed to sync_update_channel_brightness() is out of range.")
             return
         if channel is not None and (channel < 0 or channel > 2):
             logging.warning("Channel passed to sync_update_channel_brightness() is out of range.")
             return
         params = {
-            "value": (brightness / 100) * 255, #Will be removed in next version.
+            "value": brightness, #Will be removed in next version.
         }
         if channel is not None:
             params.update({REQUEST_CHANNEL_KEY: channel})
