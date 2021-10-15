@@ -118,11 +118,11 @@ class FoxSTR1S2Device(FoxBaseDevice):
 
     async def async_fetch_cover_open_level(self):
         """Fetch cover open level."""
-        await self.__async_fetch_open_level(self.__device_api_client.async_get_open_level())
+        await self.__async_fetch_open_level(self.__device_api_client.async_get_open_level)
 
     async def async_fetch_tilt_open_level(self):
         """Fetch tilt open level."""
-        await self.__async_fetch_open_level(self.__device_api_client.async_get_tilt_level(), False)
+        await self.__async_fetch_open_level(self.__device_api_client.async_get_tilt_level, False)
 
     async def __async_cover_set_level(self, level = 0, is_cover = True):
         """Set cover level.
@@ -153,6 +153,10 @@ class FoxSTR1S2Device(FoxBaseDevice):
     async def async_close_cover(self):
         """Close cover."""
         await self.__async_cover_set_level(0)
+
+    async def async_set_cover_position(self, position):
+        """Set cover position."""
+        await self.__async_cover_set_level(position)
 
     async def async_set_tilt_positon(self, position):
         """Set tilt position."""

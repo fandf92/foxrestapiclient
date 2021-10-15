@@ -102,7 +102,7 @@ class FoxDimmableDevice(FoxBaseDevice):
             logging.warning("Channel passed to sync_update_channel_brightness() is out of range.")
             return
         params = {
-            "value": brightness,
+            "value": (brightness / 100) * 255, #Will be removed in next version.
         }
         if channel is not None:
             params.update({REQUEST_CHANNEL_KEY: channel})
