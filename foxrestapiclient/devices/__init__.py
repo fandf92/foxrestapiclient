@@ -6,3 +6,4 @@ from . import fox_r1s1_device
 from . import fox_r2s2_device
 from . import fox_rgbw_device
 from . import fox_str1s2_device
+from . import service_discovery
