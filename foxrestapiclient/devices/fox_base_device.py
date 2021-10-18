@@ -86,6 +86,14 @@ class FoxBaseDevice(RestApiClient):
         if error is None:
             self.is_available = True
 
+    def get_channel_name(self, channel: int) -> str:
+        """Return channel name or name."""
+        if (self.device_info_data is None or (channel < 1 and channel > 2)):
+            return self.name
+        if len(self.device_info_data.device_channels_name) > 0:
+            return self.device_info_data.device_channels_name[channel-1]
+        return self.name
+
     def get_device_info(self) -> str:
         """Get device info JSON string.
 
