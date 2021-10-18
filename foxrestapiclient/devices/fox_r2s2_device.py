@@ -39,6 +39,6 @@ class FoxR2S2Device(FoxBaseDevice):
         """Abstract method implementation. Fetch all required data from device."""
         states = await self.async_fetch_channel_state()
         if states is not None and isinstance(states, list):
-            self.channel_one_state, self.channel_two_state = await self.async_fetch_channel_state()
+            self.channel_one_state, self.channel_two_state = states
         else:
             self.__set_channels_to_off()
