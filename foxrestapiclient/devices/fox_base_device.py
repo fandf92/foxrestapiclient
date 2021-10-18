@@ -88,7 +88,7 @@ class FoxBaseDevice(RestApiClient):
 
     def get_channel_name(self, channel: int) -> str:
         """Return channel name or name."""
-        if channel < 1 and channel > 2:
+        if (self.device_info_data is None or (channel < 1 and channel > 2)):
             return self.name
         if len(self.device_info_data.device_channels_name) > 0:
             return self.device_info_data.device_channels_name[channel-1]
