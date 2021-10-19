@@ -1,18 +1,17 @@
 """F&F Fox RGBW device implementation."""
 
 from __future__ import annotations
-from .fox_base_device import DeviceData, FoxBaseDevice
+
+import json
+
+from foxrestapiclient.connection.const import (API_RESPONSE_STATUS_FAIL,
+                                               API_RESPONSE_STATUS_OK)
 from foxrestapiclient.connection.rest_api_client import RestApiClient
 from foxrestapiclient.connection.rest_api_responses import RestApiBaseResponse
-from foxrestapiclient.connection.const import (
-    API_RESPONSE_STATUS_FAIL,
-    API_RESPONSE_STATUS_OK,
-)
-from .const import (
-    API_RGBW_SET_COLOR_HSV,
-    API_RGBW_GET_COLOR_HSV
-)
-import json
+
+from .const import API_RGBW_GET_COLOR_HSV, API_RGBW_SET_COLOR_HSV
+from .fox_base_device import DeviceData, FoxBaseDevice
+
 
 class FoxRGBWDevice(FoxBaseDevice):
     """Fox RGBW device."""
@@ -52,20 +51,24 @@ class FoxRGBWDevice(FoxBaseDevice):
     class DeviceRestApiImplementer:
         """Specific RestAPI methods definition used by device."""
 
-        def __init__(self, restApiClient: RestApiClient) -> None:
+        def __init__(self, rest_api_client: RestApiClient) -> None:
             """Initialize object."""
-            self._restApiClient = restApiClient
+            self._rest_api_client = rest_api_client
 
         async def async_get_hsv_color(self) -> FoxRGBWDevice.HSVColorData:
             """Get HSV values by given channel."""
-            device_response = await self._restApiClient.async_make_api_call_get(API_RGBW_GET_COLOR_HSV)
+            device_response = (
+                await self._rest_api_client.async_make_api_call_get(API_RGBW_GET_COLOR_HSV)
+            )
             if device_response is None:
                 return FoxRGBWDevice.HSVColorData(status=API_RESPONSE_STATUS_FAIL)
             return FoxRGBWDevice.HSVColorData(**json.loads(device_response))
 
         async def async_set_hsv_color(self, params = None) -> RestApiBaseResponse:
             """Set HSV values by given channel."""
-            device_response = await self._restApiClient.async_make_api_call_get(API_RGBW_SET_COLOR_HSV, params)
+            device_response = (
+                await self._rest_api_client.async_make_api_call_get(API_RGBW_SET_COLOR_HSV, params)
+            )
             if device_response is None:
                 return RestApiBaseResponse(status=API_RESPONSE_STATUS_FAIL)
             return RestApiBaseResponse(**json.loads(device_response))
@@ -77,6 +80,7 @@ class FoxRGBWDevice(FoxBaseDevice):
         """
         hs = [self.hsv_color[0], self.hsv_color[1]]
         return hs
+
     def get_hsv_color(self):
         """Get HSV color.
 
@@ -104,15 +108,17 @@ class FoxRGBWDevice(FoxBaseDevice):
         self.hsv_color = [hsv_data.hue, hsv_data.saturation, hsv_data.value]
         return self.hsv_color
 
-    async def async_set_brightness(self, brightness):
+    async def async_set_brightness(self, brightness) -> bool:
         """Set brightness to device.
 
         Keyword arguments:
         brightness -- value in range <0,100>
-        """
-        await self.async_set_color_hsv(value=brightness)
 
-    async def async_set_color_hsv(self, hue = None, saturation = None, value = None):
+        Return: true if success.
+        """
+        return await self.async_set_color_hsv(value=brightness)
+
+    async def async_set_color_hsv(self, hue = None, saturation = None, value = None) -> bool:
         """Set HSV color on device.
 
         Keyword arguments:
@@ -130,7 +136,8 @@ class FoxRGBWDevice(FoxBaseDevice):
         device_response = await self.__device_api_client.async_set_hsv_color(params)
         if device_response.status != API_RESPONSE_STATUS_OK:
             self._state = False
-            return
+            return False
+        return True
 
     def is_on(self, channel: int = None):
         """Return device is on status."""
