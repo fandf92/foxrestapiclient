@@ -16,3 +16,6 @@ API_RESPONSE_STATUS_INVALID = "invalid_action_name"
 #Request base params keys
 REQUEST_CHANNEL_KEY = "channel"
 REQUEST_STATE_KEY = "state"
+
+#Logger lib name
+LOGGER_NAME = "foxrestapiclient_log"
