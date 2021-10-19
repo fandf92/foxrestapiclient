@@ -30,32 +30,17 @@ class R1S1DeviceTest(unittest.TestCase):
         )
 
     @async_test
-    async def test_async_fetch_update(self):
-        try:
-            await self.device.async_fetch_update()
-        except:
-            self.assertFalse(True)
-        self.assertTrue(True)
-
-    def test_is_on(self):
-        if not isinstance(self.device.is_on(), list):
-            self.assertIn(self.device.is_on(), [True, False])
-
-    @async_test
     async def test_turn_on(self):
-        await self.device.async_set_device_state(True)
-        await self.device.async_fetch_update()
-        if not isinstance(self.device.is_on(), list):
-            self.assertTrue(self.device.is_on())
-        self.assertTrue(True)
+        self.assertTrue(await self.device.async_update_channel_state(True))
 
     @async_test
     async def test_turn_off(self):
-        await self.device.async_set_device_state(False)
+        self.assertTrue(await self.device.async_update_channel_state(False))
+
+    @async_test
+    async def test_fetch_sensor_value_by_key(self):
         await self.device.async_fetch_update()
-        if not isinstance(self.device.is_on(), list):
-            self.assertFalse(self.device.is_on())
-        self.assertTrue(True)
+        self.assertIsNone(self.device.fetch_sensor_value_by_key("voltage"))
 
 if __name__ == '__main__':
     unittest.main()

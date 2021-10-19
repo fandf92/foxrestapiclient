@@ -29,18 +29,30 @@ class RGBWDeviceTest(unittest.TestCase):
         DeviceData(NAME, HOST, API_KEY, UNIQUE_ID, TYPE, CHANNELS)
         )
 
+    def test_get_hs_color(self):
+        self.assertIsInstance(self.device.get_hs_color(), list)
+
+    def test_get_hsv_color(self):
+        self.assertIsInstance(self.device.get_hsv_color(), list)
+
+    def test_get_brightness(self):
+        self.assertIsInstance(self.device.get_brightness(), int)
+
     @async_test
-    async def test_async_color_hsv(self):
-        await self.device.async_set_color_hsv(100,80,70)
-        await asyncio.sleep(5)
-        hsv = await self.device.async_fetch_color_hsv()
-        self.assertEqual(hsv[0], 100)
-        self.assertEqual(hsv[1], 80)
-        self.assertEqual(hsv[2], 68)
+    async def test_async_fetch_color_hsv(self):
+        self.assertIsNot(await self.device.async_fetch_color_hsv(), [0,0,0])
 
     @async_test
     async def test_async_set_brightness(self):
-        await self.device.async_set_brightness(0)
+        self.assertTrue(await self.device.async_set_brightness(43))
+
+    @async_test
+    async def test_async_set_color_hsv(self):
+        self.assertTrue(await self.device.async_set_color_hsv(359, 80, 20))
+
+    @async_test
+    async def test_update(self):
+        await self.device.async_fetch_update()
 
 if __name__ == '__main__':
     unittest.main()
