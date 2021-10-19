@@ -1,27 +1,21 @@
 """F&F Fox devices RestAPI client. See www.fif.com.pl/fox."""
-import aiohttp
-from .const import (
-    API_COMMON_DEVICE_OFF,
-    API_COMMON_DEVICE_ON,
-    API_COMMON_GET_DEVICE_INFO,
-    API_COMMON_GET_STATE,
-    API_COMMON_SET_STATE,
-    API_CLIENT_CONNECTION_TIMEOUT,
-    API_RESPONSE_STATUS_FAIL,
-    REQUEST_CHANNEL_KEY,
-    REQUEST_STATE_KEY,
-
-)
 import json
-import logging
-from .rest_api_responses import (
-    RestApiBaseResponse,
-    RestApiDeviceInfoResponse,
-    RestApiDeviceStateResponse,
-    RestApiError
-)
+
+import aiohttp
 import requests
 from requests.compat import urljoin
+
+from foxrestapiclient.connection import _LOGGER
+
+from .const import (API_CLIENT_CONNECTION_TIMEOUT, API_COMMON_DEVICE_OFF,
+                    API_COMMON_DEVICE_ON, API_COMMON_GET_DEVICE_INFO,
+                    API_COMMON_GET_STATE, API_COMMON_SET_STATE,
+                    API_RESPONSE_STATUS_FAIL, REQUEST_CHANNEL_KEY,
+                    REQUEST_STATE_KEY)
+from .rest_api_responses import (RestApiBaseResponse,
+                                 RestApiDeviceInfoResponse,
+                                 RestApiDeviceStateResponse, RestApiError)
+
 
 class RestApiClient:
     """RestAPI client implmentation.
@@ -68,7 +62,7 @@ class RestApiClient:
         params = {}
         if channel is not None:
             params = {REQUEST_CHANNEL_KEY: channel}
-        logging.info("Making call in async_api_get_device_state().")
+        _LOGGER.info("Making call in async_api_get_device_state().")
         response_content = await self.async_make_api_call_get(API_COMMON_GET_STATE, params)
         if response_content is None:
             return RestApiDeviceStateResponse(status=API_RESPONSE_STATUS_FAIL)
@@ -87,11 +81,11 @@ class RestApiClient:
         Return: RestApiBaseResponse
         """
         params = {
-            REQUEST_STATE_KEY: API_COMMON_DEVICE_ON if state == True else API_COMMON_DEVICE_OFF
+            REQUEST_STATE_KEY: API_COMMON_DEVICE_ON if state is True else API_COMMON_DEVICE_OFF
         }
         if channel is not None:
             params.update({REQUEST_CHANNEL_KEY: channel})
-        logging.info("Making call in async_api_set_device_state() with params {0}.".format(params))
+        _LOGGER.info("Making call in async_api_set_device_state() with params %s", params)
         response_content = await self.async_make_api_call_get(API_COMMON_SET_STATE, params)
         if response_content is None:
             return RestApiBaseResponse(API_RESPONSE_STATUS_FAIL)
@@ -105,12 +99,13 @@ class RestApiClient:
         Get device information such as firmware version, name etc.
         See RestApiDeviceInfoResponse to check what data is returnig from device.
         """
-        logging.info("Making call in async_api_get_device_info().")
+        _LOGGER.info("Making call in async_api_get_device_info().")
         response_content = await self.async_make_api_call_get(API_COMMON_GET_DEVICE_INFO)
         if response_content is None:
             return RestApiDeviceInfoResponse(status=API_RESPONSE_STATUS_FAIL)
         if isinstance(response_content, RestApiError):
-            return RestApiDeviceInfoResponse(status=API_RESPONSE_STATUS_FAIL, errorObj=response_content)
+            return RestApiDeviceInfoResponse(status=API_RESPONSE_STATUS_FAIL,
+                errorObj=response_content)
         return RestApiDeviceInfoResponse(**json.loads(response_content))
 
     async def async_make_api_call_get(self, method: str, query_params = None):
@@ -121,27 +116,27 @@ class RestApiClient:
         query_params - optional request parameters
         """
         if not isinstance(method, str):
-            logging.warning("Wrong argument passed to method. Http method accept only string values.")
+            _LOGGER.warning("Wrong argument passed to method. Http method accept only string values.")
             return
         if query_params is not None and not isinstance(query_params, dict):
-            logging.warning("Wrong argument passed to method. Query params must be dict.")
+            _LOGGER.warning("Wrong argument passed to method. Query params must be dict.")
             return
         try:
             async with aiohttp.ClientSession(timeout = self.__session_timeout) as session:
                 async with session.get(urljoin(self.get_base_api_url(), method), params=query_params) as resp:
                     response = await resp.read()
-                    logging.info("Received RAW response {0}".format(response))
+                    _LOGGER.info("Received RAW response %s", response)
                     self.__invoke_response_error_hook(None) #Raise reponse_error_hook with None errors.
                     return response
-        except aiohttp.ClientConnectionError as e:
-            logging.error(e)
-            self.__invoke_response_error_hook(e)
-        except requests.exceptions.RequestException as e:
-            logging.error(e)
-            self.__invoke_response_error_hook(e)
+        except aiohttp.ClientConnectionError as cli_error:
+            _LOGGER.error(cli_error)
+            self.__invoke_response_error_hook(cli_error)
+        except requests.exceptions.RequestException as req_error:
+            _LOGGER.error(req_error)
+            self.__invoke_response_error_hook(req_error)
         return None
 
-    def __invoke_response_error_hook(self, e):
+    def __invoke_response_error_hook(self, error):
         """Invoke response error hook if registered."""
-        if self.__response_error_hook != None:
-                self.__response_error_hook(e)
+        if self.__response_error_hook is not None:
+            self.__response_error_hook(error)
