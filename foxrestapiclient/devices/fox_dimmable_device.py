@@ -22,7 +22,7 @@ class FoxDimmableDevice(FoxBaseDevice):
         super().__init__(device_data.name, device_data.host, device_data. api_key,
                         device_data.mac_addr, device_data.type)
         #Extened RestApi methods, specific for device
-        self.__device_api_client = self.DeviceRestApiImplementer(super())
+        self.__device_api_client = self.DeviceRestApiImplementer(self._rest_api_client)
 
     class DeviceRestApiImplementer:
         """Inner class with specific RestApi methods definition used by device."""
