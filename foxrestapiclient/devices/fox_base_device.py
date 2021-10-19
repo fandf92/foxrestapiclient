@@ -24,7 +24,7 @@ class DeviceData:
         self.host = host
         self.api_key = api_key
         self.mac_addr = mac_addr
-        self.type = dev_type
+        self.dev_type = dev_type
         self.channels = channels
 
 class UnsupportedDevice(Exception):
@@ -35,16 +35,15 @@ class FoxBaseDevice:
     """F&F Fox base device class."""
 
     __metaclass__ = abc.ABCMeta
-    def __init__(self, name: str, host: str, api_key: str, mac_addr: str,
-                dev_type: int):
+    def __init__(self, device_data: DeviceData):
         """Construct object with data passed. Warning! can be exception raised."""
-        self.type = dev_type
-        self.name = name
-        self.mac_addr = mac_addr
+        self.dev_type = device_data.dev_type
+        self.name = device_data.name
+        self.mac_addr = device_data.mac_addr
         self.device_info_data: RestApiDeviceInfoResponse = None
         self.is_available = False
-        self._rest_api_client = RestApiClient(host, api_key)
-        self.__init_device_platform(dev_type)
+        self._rest_api_client = RestApiClient(device_data.host, device_data.api_key)
+        self.__init_device_platform(device_data.dev_type)
 
     def __init_device_platform(self, dev_type: int):
         """Initialize device platform.
@@ -115,7 +114,7 @@ class FoxBaseDevice:
             },
             "name": name,
             "manufacturer": MANUFACTURER_NAME,
-            "model": DEVICES[self.type],
+            "model": DEVICES[self.dev_type],
             "sw_version": sw_version
         }
 

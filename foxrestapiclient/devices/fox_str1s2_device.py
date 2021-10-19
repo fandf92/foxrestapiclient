@@ -20,8 +20,7 @@ class FoxSTR1S2Device(FoxBaseDevice):
 
     def __init__(self, device_data: DeviceData):
         """Initalize object."""
-        super().__init__(device_data.name, device_data.host, device_data.api_key,
-                        device_data.mac_addr, device_data.type)
+        super().__init__(device_data)
         #State reprsents cover open or close
         self._state = False
         self.__device_api_client = self.DeviceRestApiImplementer(self._rest_api_client)
