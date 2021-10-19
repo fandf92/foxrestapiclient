@@ -1,53 +1,52 @@
 """F&F Fox base device implementation."""
 from __future__ import annotations
+
 import abc
 
 from aiohttp.client_exceptions import ClientConnectionError
+
 from foxrestapiclient.connection.rest_api_client import RestApiClient
-from foxrestapiclient.connection.rest_api_responses import RestApiDeviceInfoResponse
-from .const import (
-    API_RESPONSE_STATUS_FAIL,
-    API_RESPONSE_STATUS_INVALID,
-    DEVICES,
-    DEVICE_ON,
-    DEVICE_OFF,
-    DEVICE_PLATFORM,
-    MANUFACTURER_NAME
-)
+from foxrestapiclient.connection.rest_api_responses import \
+    RestApiDeviceInfoResponse
+
+from .const import (API_RESPONSE_STATUS_FAIL, API_RESPONSE_STATUS_INVALID, API_RESPONSE_STATUS_OK,
+                    DEVICE_OFF, DEVICE_ON, DEVICE_PLATFORM, DEVICES,
+                    MANUFACTURER_NAME)
+
 
 class DeviceData:
     """DeviceData holder. Used for simple object creation."""
 
-    def __init__(self, name: str, host: str, api_key: str, mac_addr: str, type: int, channels: list = None):
+    def __init__(self, name: str, host: str, api_key: str, mac_addr: str, dev_type: int,
+            channels: list = None):
         """Init all required values."""
         self.name = name
         self.host = host
         self.api_key = api_key
         self.mac_addr = mac_addr
-        self.type = type
+        self.type = dev_type
         self.channels = channels
 
 class UnsupportedDevice(Exception):
     """Custom exception for unsupported device."""
 
-    pass
 
 class FoxBaseDevice(RestApiClient):
     """F&F Fox base device class."""
 
     __metaclass__ = abc.ABCMeta
     def __init__(self, name: str, host: str, api_key: str, mac_addr: str,
-                type: int):
+                dev_type: int):
         """Construct object with data passed. Warning! can be exception raised."""
         super().__init__(host, api_key)
-        self.__init_device_platform(type)
-        self.type = type
+        self.__init_device_platform(dev_type)
+        self.type = dev_type
         self.name = name
         self.mac_addr = mac_addr
         self.device_info_data: RestApiDeviceInfoResponse = None
         self.is_available = False
 
-    def __init_device_platform(self, type: int):
+    def __init_device_platform(self, dev_type: int):
         """Initialize device platform.
 
         Keyword arguments:
@@ -57,12 +56,12 @@ class FoxBaseDevice(RestApiClient):
         If type not exsist in DEVICE_PLATFORM exception UnsupportedDevice will be raised.
         """
         try:
-            self.device_platform = DEVICE_PLATFORM[type]
+            self.device_platform = DEVICE_PLATFORM[dev_type]
             self.register_response_error_hook(self.__track_available)
         except:
             raise UnsupportedDevice("Not supported device. Check type param.")
 
-    def equals(self, foxBaseDevice: FoxBaseDevice) -> bool:
+    def equals(self, fox_base_device: FoxBaseDevice) -> bool:
         """Compare object and return that are equal.
 
         Comparation works on unique identifier.
@@ -73,9 +72,9 @@ class FoxBaseDevice(RestApiClient):
         Return:
         true if devices are equal.
         """
-        if foxBaseDevice is None:
+        if fox_base_device is None:
             return False
-        if self.mac_addr == foxBaseDevice.mac_addr:
+        if self.mac_addr == fox_base_device.mac_addr:
             return True
         return False
 
@@ -90,7 +89,7 @@ class FoxBaseDevice(RestApiClient):
         """Return channel name or name."""
         if (self.device_info_data is None or (channel < 1 and channel > 2)):
             return self.name
-        if len(self.device_info_data.device_channels_name) > 0:
+        if len(self.device_info_data.device_channels_name) > 1:
             return self.device_info_data.device_channels_name[channel-1]
         return self.name
 
@@ -107,7 +106,7 @@ class FoxBaseDevice(RestApiClient):
         sw_version = "0.0.0"
         if self.device_info_data is not None:
             name = self.device_info_data.device_friendly_name
-            sw_version = self.device_info_data.firmware,
+            sw_version = self.device_info_data.firmware
 
         return {
             "identifiers": {
@@ -119,24 +118,6 @@ class FoxBaseDevice(RestApiClient):
             "model": DEVICES[self.type],
             "sw_version": sw_version
         }
-
-    async def async_set_device_state(self, is_on, channel = None):
-        """Set device state.
-
-        Set state on or off on F&F Fox device.
-
-        Keyword arguments:
-        is_on -- determine to set device on, if true device will be turned on otherwise turned off.
-        channel -- optional, set state on specified channel.
-        """
-        device_state = await self.async_api_set_device_state(is_on, channel)
-        if (device_state.status == API_RESPONSE_STATUS_FAIL
-            or device_state.status == API_RESPONSE_STATUS_INVALID):
-            self._state = False
-        elif device_state == DEVICE_ON:
-            self._state = True
-        else:
-            self._state = False
 
     async def async_fetch_channel_state(self, channel: int = None) -> bool | list:
         """Fetch device state.
@@ -154,18 +135,17 @@ class FoxBaseDevice(RestApiClient):
         bool - device has only one channel, true or false.
         """
         device_response = await self.async_api_get_device_state(channel)
-        if (device_response.status == API_RESPONSE_STATUS_FAIL or
-                device_response.status == API_RESPONSE_STATUS_INVALID):
+        if device_response.status in (API_RESPONSE_STATUS_FAIL, API_RESPONSE_STATUS_INVALID):
             self.is_available = False
             return False
         self.is_available = True
         if device_response.state == DEVICE_ON:
             return True
-        elif device_response.state == DEVICE_OFF:
+        if device_response.state == DEVICE_OFF:
             return False
         values = []
         if device_response.channel_1_state == DEVICE_ON:
-             values.append(True)
+            values.append(True)
         else:
             values.append(False)
         if device_response.channel_2_state == DEVICE_ON:
@@ -187,13 +167,9 @@ class FoxBaseDevice(RestApiClient):
         true or false depends on device response.
         """
         device_response = await self.async_api_set_device_state(state, channel)
-        if (device_response.status == API_RESPONSE_STATUS_FAIL or
-                device_response.status == API_RESPONSE_STATUS_INVALID):
+        if device_response.status in (API_RESPONSE_STATUS_FAIL, API_RESPONSE_STATUS_INVALID):
             return False
-        elif device_response.status == DEVICE_ON:
-            return True
-        else:
-            return False
+        return device_response.status == API_RESPONSE_STATUS_OK
 
     async def async_fetch_device_info(self):
         """Fetch device info.
@@ -203,13 +179,13 @@ class FoxBaseDevice(RestApiClient):
         in Fox mobile application has priority.
         """
         device_response: RestApiDeviceInfoResponse = await self.async_api_get_device_info()
-        if (device_response.status == API_RESPONSE_STATUS_FAIL or
-                device_response.status == API_RESPONSE_STATUS_INVALID):
-            return
+        if device_response.status in (API_RESPONSE_STATUS_FAIL, API_RESPONSE_STATUS_INVALID):
+            return False
         self.device_info_data = device_response
         #Overwrite device name from user app config
         if device_response.device_name is not None:
             self.name = device_response.device_name
+        return True
 
     async def async_fetch_device_available_data(self):
         """Fetch all available data from device."""
