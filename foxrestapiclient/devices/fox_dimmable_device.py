@@ -86,7 +86,7 @@ class FoxDimmableDevice(FoxBaseDevice):
             values.append(device_response.channel_2_value)
         return values
 
-    async def async_update_channel_brightness(self, brightness: int, channel: int = None):
+    async def async_update_channel_brightness(self, brightness: int, channel: int = None) -> bool:
         """Set brightness value on device.
 
         Keyword arguments:
@@ -96,11 +96,11 @@ class FoxDimmableDevice(FoxBaseDevice):
         if brightness < 0 or brightness > 255:
             _LOGGER.warning(
                 "Brightness passed to sync_update_channel_brightness() is out of range.")
-            return
+            return False
         if channel is not None and (channel < 0 or channel > 2):
             _LOGGER.warning(
                 "Channel passed to sync_update_channel_brightness() is out of range.")
-            return
+            return False
         params = {
             "value": brightness
         }
@@ -109,3 +109,5 @@ class FoxDimmableDevice(FoxBaseDevice):
         device_response = await self.__device_api_client.async_set_brighntess_value(params)
         if device_response.status in (API_RESPONSE_STATUS_FAIL, API_RESPONSE_STATUS_INVALID):
             _LOGGER.error("Setting brightness value in async_update_channel_brightness() failed.")
+        return True
+
