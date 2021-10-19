@@ -24,7 +24,7 @@ class FoxSTR1S2Device(FoxBaseDevice):
                         device_data.mac_addr, device_data.type)
         #State reprsents cover open or close
         self._state = False
-        self.__device_api_client = self.DeviceRestApiImplementer(super())
+        self.__device_api_client = self.DeviceRestApiImplementer(self._rest_api_client)
         self._cover_position = 0
         self._tilt_position = 0
 
