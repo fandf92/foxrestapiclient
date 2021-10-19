@@ -17,7 +17,7 @@ class FoxR1S1Device(FoxBaseDevice):
         """Initialize object by given device data."""
         super().__init__(device_data.name, device_data.host, device_data.api_key,
                         device_data.mac_addr, device_data.type)
-        self.__device_api_client = self.DeviceRestApiImplementer(super())
+        self.__device_api_client = self.DeviceRestApiImplementer(self._rest_api_client)
         self.has_sensor_data = True
         self._state = False
         self.total_energy_data = self.EnergySensorData()
@@ -52,7 +52,7 @@ class FoxR1S1Device(FoxBaseDevice):
             self.frequency = frequency
             self.power_factor = power_factor
 
-    class DeviceRestApiImplementer():
+    class DeviceRestApiImplementer:
         """RestAPI methods definition used by Fox R1S1 device."""
 
         def __init__(self, rest_api_client: RestApiClient) -> None:
