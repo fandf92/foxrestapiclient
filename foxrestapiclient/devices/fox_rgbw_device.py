@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-
+from foxrestapiclient.connection import _LOGGER
 from foxrestapiclient.connection.const import (API_RESPONSE_STATUS_FAIL,
                                                API_RESPONSE_STATUS_OK)
 from foxrestapiclient.connection.rest_api_client import RestApiClient
@@ -21,7 +21,7 @@ class FoxRGBWDevice(FoxBaseDevice):
         super().__init__(device_data.name, device_data.host, device_data.api_key,
                         device_data.mac_addr, device_data.type)
         self.hsv_color = [0, 0, 0]
-        self.__device_api_client = self.DeviceRestApiImplementer(super())
+        self.__device_api_client = self.DeviceRestApiImplementer(self._rest_api_client)
         self._state = False
 
     class HSVColorData(RestApiBaseResponse):
@@ -128,11 +128,20 @@ class FoxRGBWDevice(FoxBaseDevice):
         """
         params = {}
         if hue is not None:
-            params.update({"h": int(hue) if hue < 360 else 359})
+            if not (hue > 0 and hue < 360):
+                _LOGGER.warning("Hue is out of range. Accepted <0;359>")
+                return False
+            params.update({"h": int(hue)})
         if saturation is not None:
+            if not (saturation > 0 and saturation < 101):
+                _LOGGER.warning("Saturation is out of range. Accepted <0;100>")
+                return False
             params.update({"s": int(saturation)})
         if value is not None:
-            params.update({"v": int(100 * ((int(value)) / 255))})
+            if not (value > 0 and value < 101):
+                _LOGGER.warning("Value is out of range. Accepted <0;100>")
+                return False
+            params.update({"v": int(value)})
         device_response = await self.__device_api_client.async_set_hsv_color(params)
         if device_response.status != API_RESPONSE_STATUS_OK:
             self._state = False
