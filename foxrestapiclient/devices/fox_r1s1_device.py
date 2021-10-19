@@ -1,16 +1,13 @@
 """F&F Fox R1S1 device implementation."""
 
-from .fox_base_device import DeviceData, FoxBaseDevice
+import json
+
+from foxrestapiclient.connection.const import API_RESPONSE_STATUS_FAIL
 from foxrestapiclient.connection.rest_api_client import RestApiClient
 from foxrestapiclient.connection.rest_api_responses import RestApiBaseResponse
-from foxrestapiclient.connection.const import (
-    API_RESPONSE_STATUS_FAIL,
-)
-from .const import (
-    API_R1S1_GET_AC_PARAMETERS,
-    API_R1S1_GET_TOTAL_ENERGY_DATA
-)
-import json
+
+from .const import API_R1S1_GET_AC_PARAMETERS, API_R1S1_GET_TOTAL_ENERGY_DATA
+from .fox_base_device import DeviceData, FoxBaseDevice
 
 
 class FoxR1S1Device(FoxBaseDevice):
@@ -22,14 +19,17 @@ class FoxR1S1Device(FoxBaseDevice):
                         device_data.mac_addr, device_data.type)
         self.__device_api_client = self.DeviceRestApiImplementer(super())
         self.has_sensor_data = True
-        self.total_energy_data = self.EnergySensorData
-        self.ac_parameters_data = self.ACParamsSensorData
+        self._state = False
+        self.total_energy_data = self.EnergySensorData()
+        self.ac_parameters_data = self.ACParamsSensorData()
+        self.__init_all_sensor_values()
 
     class EnergySensorData(RestApiBaseResponse):
         """Energy sensor data holder."""
 
-        def __init__(self, active_energy: str = None, reactive_energy: str = None, active_energy_import: str = None,
-                    reactive_energy_import: str = None, status: str = API_RESPONSE_STATUS_FAIL) -> None:
+        def __init__(self, active_energy: str = None, reactive_energy: str = None,
+                active_energy_import: str = None, reactive_energy_import: str = None,
+                status: str = API_RESPONSE_STATUS_FAIL) -> None:
             """Initialize obiect."""
             super().__init__(status)
             self.active_energy = active_energy
@@ -52,12 +52,12 @@ class FoxR1S1Device(FoxBaseDevice):
             self.frequency = frequency
             self.power_factor = power_factor
 
-    class DeviceRestApiImplementer(RestApiClient):
+    class DeviceRestApiImplementer():
         """RestAPI methods definition used by Fox R1S1 device."""
 
-        def __init__(self, restApiClient: RestApiClient) -> None:
+        def __init__(self, rest_api_client: RestApiClient) -> None:
             """Initialize obiect."""
-            self._restApiClient = restApiClient
+            self._rest_api_client = rest_api_client
 
         async def async_fetch_ac_parameters_data(self):
             """Fetch AC parametrs from device.
@@ -65,28 +65,24 @@ class FoxR1S1Device(FoxBaseDevice):
             Get information about electricty network such as voltage, current etc.
             see ACParamsSensorData to show what data can be readed.
             """
-            device_response = await self._restApiClient.async_make_api_call_get(API_R1S1_GET_AC_PARAMETERS)
+            device_response = (
+                await self._rest_api_client.async_make_api_call_get(API_R1S1_GET_AC_PARAMETERS)
+            )
             if device_response is None:
                 return FoxR1S1Device.ACParamsSensorData(status=API_RESPONSE_STATUS_FAIL)
             return FoxR1S1Device.ACParamsSensorData(**json.loads(device_response))
 
         async def async_fetch_total_energy_data(self):
             """Fetch total energy parametrs from device."""
-            device_response = await self._restApiClient.async_make_api_call_get(API_R1S1_GET_TOTAL_ENERGY_DATA)
+            device_response = (
+                await self._rest_api_client.async_make_api_call_get(API_R1S1_GET_TOTAL_ENERGY_DATA)
+            )
             if device_response is None:
                 return FoxR1S1Device.EnergySensorData(status=API_RESPONSE_STATUS_FAIL)
             return FoxR1S1Device.EnergySensorData(**json.loads(device_response))
 
-    def fetch_sensor_value_by_key(self, key: str):
-        """Fetch readed value from device by key.
-
-        If key not exist NaN str will be returned.
-
-        Keyword arguments:
-        key -- related value by key.
-        Return:
-        returned value by provided key.
-        """
+    def __init_all_sensor_values(self):
+        """Initialize all sensor values JSON string."""
         self.all_sensor_values = {
             "voltage": self.ac_parameters_data.voltage,
             "current": self.ac_parameters_data.current,
@@ -99,6 +95,17 @@ class FoxR1S1Device(FoxBaseDevice):
             "active_energy_import": self.total_energy_data.active_energy_import,
             "reactive_energy_import": self.total_energy_data.reactive_energy_import,
         }
+
+    def fetch_sensor_value_by_key(self, key: str):
+        """Fetch readed value from device by key.
+
+        If key not exist NaN str will be returned.
+
+        Keyword arguments:
+        key -- related value by key.
+        Return:
+        returned value by provided key.
+        """
         try:
             return self.all_sensor_values[key]
         except KeyError:
