@@ -123,3 +123,4 @@ class FoxR1S1Device(FoxBaseDevice):
         self._state = await self.async_fetch_channel_state()
         self.total_energy_data = await self.__device_api_client.async_fetch_total_energy_data()
         self.ac_parameters_data = await self.__device_api_client.async_fetch_ac_parameters_data()
+        self.__init_all_sensor_values()
