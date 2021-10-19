@@ -31,11 +31,11 @@ class STR1S2DeviceTest(unittest.TestCase):
 
     @async_test
     async def test_set_tilt_postion(self):
-        await self.device.async_set_tilt_positon(40)
+        self.assertTrue(await self.device.async_set_tilt_positon(10))
 
     @async_test
     async def test_set_cover_postion(self):
-        await self.device.async_open_cover()
+        self.assertTrue(await self.device.async_open_cover())
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,9 @@
 """F&F Fox R2S2 device implementation."""
 
-import logging
+from foxrestapiclient.connection import _LOGGER
+
 from .fox_base_device import DeviceData, FoxBaseDevice
+
 
 class FoxR2S2Device(FoxBaseDevice):
     """F&F Fox R2S2 device implementation. Two relays and two switches."""
@@ -15,7 +17,7 @@ class FoxR2S2Device(FoxBaseDevice):
         self.channel_one_state = False
         self.channel_two_state = False
 
-    def is_on(self, channel: int) -> bool:
+    def is_on(self, channel: int = None):
         """Return device is on status.
 
         Return F&F Fox R2S2 device status. Check if it is on by given channel.
@@ -26,7 +28,7 @@ class FoxR2S2Device(FoxBaseDevice):
         channel state, on or off.
         """
         if channel < 0 or channel > 2:
-            logging.warning("Passed channel in is_on() has wrong value. Only 1 or 2 are accepted.")
+            _LOGGER.warning("Passed channel in is_on() has wrong value. Only 1 or 2 are accepted.")
             return False
         return self.channel_one_state if channel == 1 else self.channel_two_state
 
@@ -39,6 +41,6 @@ class FoxR2S2Device(FoxBaseDevice):
         """Abstract method implementation. Fetch all required data from device."""
         states = await self.async_fetch_channel_state()
         if states is not None and isinstance(states, list):
-            self.channel_one_state, self.channel_two_state = await self.async_fetch_channel_state()
+            self.channel_one_state, self.channel_two_state = states
         else:
             self.__set_channels_to_off()

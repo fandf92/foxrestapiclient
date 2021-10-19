@@ -1,14 +1,14 @@
 """Service discovery for F&F Fox devices."""
 import asyncio
-from .const import (
-    DEVICES,
-    DEVICE_DISCOVERY_RESPONSE_HEADER,
-    DEVICE_DISCOVERY_REQUEST_HEADER,
-    MIN_DATA_SIZE_TO_PARSE
-)
-from .fox_base_device import DeviceData
-import logging
 from typing import Tuple
+
+from foxrestapiclient.connection import _LOGGER
+
+from .const import (DEVICE_DISCOVERY_REQUEST_HEADER,
+                    DEVICE_DISCOVERY_RESPONSE_HEADER, DEVICES,
+                    MIN_DATA_SIZE_TO_PARSE)
+from .fox_base_device import DeviceData
+
 
 class DeviceDiscoverProtocol(asyncio.DatagramProtocol):
     """Device disover protocol used in asyncio service discovery implementation."""
@@ -17,10 +17,6 @@ class DeviceDiscoverProtocol(asyncio.DatagramProtocol):
         """Construct object."""
         super().__init__()
         self._datagram_parser_callback = datagram_parser_callback
-
-    def connection_made(self, transport):
-        """Set transport object."""
-        self.transport = transport
 
     def datagram_received(self, data: bytes, addr: Tuple[str, int]) -> None:
         """Datagram reveived.
@@ -32,13 +28,12 @@ class DeviceDiscoverProtocol(asyncio.DatagramProtocol):
         addr -- typle with sender ip address and port.
 
         """
-
         if self._datagram_parser_callback:
             self._datagram_parser_callback(data, addr)
 
     def error_received(self, exc):
         """Error received in UDP data."""
-        logging.error("Exception thrown in UDP data receiving: %s" % exc)
+        _LOGGER.error("Exception thrown in UDP data receiving: %s", exc)
 
 class FoxServiceDiscovery:
     """Discover F&F Fox devices in local network over UDP broadcast."""
@@ -81,7 +76,10 @@ class FoxServiceDiscovery:
         try:
             for i in range(default_tries):
                 #Send message to UDP broadcast
-                transport.sendto(DEVICE_DISCOVERY_REQUEST_HEADER.encode(), ('255.255.255.255', 1918))
+                transport.sendto(
+                    DEVICE_DISCOVERY_REQUEST_HEADER.encode(),
+                    ('255.255.255.255', 1918)
+                )
                 await asyncio.sleep(4)
         finally:
             transport.close()
@@ -89,13 +87,13 @@ class FoxServiceDiscovery:
 
     def parse_received_datagram(self, data: bytes, addr):
         """Parse UDP message."""
-        if (len(data) < MIN_DATA_SIZE_TO_PARSE):
-            logging.warring("Received data size is not enough to parsing it.")
+        if len(data) < MIN_DATA_SIZE_TO_PARSE:
+            _LOGGER.warring("Received data size is not enough to parsing it.")
         if len(data) < len(DEVICE_DISCOVERY_RESPONSE_HEADER.encode()):
-            logging.error("Parsing UDP response error. Cannot discover F&F Fox device.")
+            _LOGGER.error("Parsing UDP response error. Cannot discover F&F Fox device.")
             return
         if data[0:36].decode() != DEVICE_DISCOVERY_RESPONSE_HEADER:
-            logging.warning("Response not indicate to F&F Fox device.")
+            _LOGGER.warning("Response not indicate to F&F Fox device.")
             return
         device_type = int.from_bytes(data[42:44], "little")
         device_unique_id = data[36:42].hex()
@@ -107,8 +105,8 @@ class FoxServiceDiscovery:
                 device_unique_id,
                 device_type
             )
-            logging.info("Received datagram from {0}. Successfuly parsed.".format(addr))
-            if self.__check_exsist_device(discovered_device) == False:
+            _LOGGER.info("Received datagram from %s. Successfuly parsed.", addr)
+            if self.__check_exsist_device(discovered_device) is False:
                 self._discovered_devices.append(discovered_device)
         except KeyError:
-            logging.error("Unsupported! F&F Fox device not implmeneted yet.")
+            _LOGGER.error("Unsupported! F&F Fox device not implmeneted yet.")

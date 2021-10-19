@@ -30,16 +30,13 @@ class R2S2DeviceTest(unittest.TestCase):
         )
 
     @async_test
-    async def test_async_fetch_update(self):
+    async def test_turn_on(self):
+        self.assertTrue(await self.device.async_update_channel_state(True,1))
 
-        try:
-            await self.device.async_fetch_update()
-        except:
-            self.assertFalse(True)
-        self.assertTrue(True)
+    @async_test
+    async def test_turn_off(self):
+        self.assertTrue(await self.device.async_update_channel_state(False,2))
 
-    def test_is_on(self):
-        self.assertIn(self.device.is_on(2), [True, False])
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,6 +3,7 @@
 from .fox_base_device import DeviceData
 from .fox_dimmable_device import FoxDimmableDevice
 
+
 class FoxDIM1S2Device(FoxDimmableDevice):
     """DIM1S2 device one channel dimmer 230V."""
 

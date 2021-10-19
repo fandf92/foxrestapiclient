@@ -29,23 +29,19 @@ class DimmableDeviceTest(unittest.TestCase):
         )
 
     @async_test
-    async def test_turn_off(self):
-        await self.device.async_update_channel_state(False, 1)
-        await self.device.async_update_channel_state(False, 2)
-        await self.device.async_fetch_update()
-        await asyncio.sleep(1)
-
-    @async_test
-    async def test_turn_on(self):
-        await self.device.async_update_channel_state(True, 1)
-        await self.device.async_update_channel_state(True, 2)
-        await self.device.async_fetch_update()
-        await asyncio.sleep(1)
+    async def test_async_fetch_channel_brightness(self):
+        self.assertIsInstance(
+            await self.device.async_fetch_channel_brightness(),
+            list
+        )
 
     @async_test
     async def test_async_update_channel_brightness(self):
-        await self.device.async_update_channel_brightness(10, 1)
-        await self.device.async_update_channel_brightness(10, 2)
+        self.assertTrue(await self.device.async_update_channel_brightness(255, 2))
+
+    @async_test
+    async def test_async_update_channel_state(self):
+        self.assertTrue(await self.device.async_update_channel_state(False, 9))
 
 if __name__ == '__main__':
     unittest.main()

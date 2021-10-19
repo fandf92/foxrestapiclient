@@ -30,13 +30,11 @@ class DIM1S2DeviceTest(unittest.TestCase):
 
     @async_test
     async def test_turn_off(self):
-        await self.device.async_set_device_state(False)
-        await asyncio.sleep(1)
+        self.assertTrue(await self.device.async_update_channel_state(False))
 
     @async_test
     async def test_turn_on(self):
-        await self.device.async_set_device_state(True)
-        await self.device.async_fetch_update()
+        self.assertTrue(await self.device.async_update_channel_state(True))
 
     @async_test
     async def test_async_update_channel_brightness(self):

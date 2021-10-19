@@ -1,8 +1,10 @@
 """F&F Fox LED2S2 device implementation."""
 
-import logging
+from foxrestapiclient.connection import _LOGGER
+
 from .fox_base_device import DeviceData
 from .fox_dimmable_device import FoxDimmableDevice
+
 
 class FoxLED2S2Device(FoxDimmableDevice):
     """LED2S2 Device implementation."""
@@ -25,7 +27,7 @@ class FoxLED2S2Device(FoxDimmableDevice):
         channel -- channel number to check that is on or off. Must be in ranfe <1,2>
         """
         if channel < 0 or channel > 2:
-            logging.warning("Channel provided to is_on() is out of range.")
+            _LOGGER.warning("Channel provided to is_on() is out of range.")
             return False
         return self.channel_one_state if channel == 1 else self.channel_two_state
 
@@ -42,10 +44,12 @@ class FoxLED2S2Device(FoxDimmableDevice):
     async def async_update_channel_one_state(self, state: bool):
         """Update device channel one state by given value."""
         self.channel_one_state = await self.async_update_channel_state(state, self.channels[0])
+        return self.channel_one_state
 
     async def async_update_channel_two_state(self, state: bool):
         """Update device channel one state by given value."""
         self.channel_two_state = await self.async_update_channel_state(state, self.channels[1])
+        return self.channel_two_state
 
     async def async_fetch_channel_one_brightness(self) -> int:
         """Fetch channel one brightness value."""
@@ -68,17 +72,19 @@ class FoxLED2S2Device(FoxDimmableDevice):
     async def async_update_channel_one_brightness(self):
         """Update channel one brightness."""
         self.channel_one_brightness = await self.async_update_channel_brightness(self.channels[0])
+        return self.channel_one_brightness
 
     async def async_update_channel_two_brightness(self):
         """Update channel two brightness."""
         self.channel_two_brightness = await self.async_update_channel_brightness(self.channels[1])
+        return self.channel_two_brightness
 
     def __reset_channels_state(self):
         """Reset channels state."""
         self.channel_one_state = False
         self.channel_two_state = False
 
-    def __reset_channels_brighntess(self):
+    def __reset_channels_brightness(self):
         """Reset channels brightness."""
         self.channel_one_brightness = 0
         self.channel_two_brightness = 0
@@ -90,10 +96,10 @@ class FoxLED2S2Device(FoxDimmableDevice):
             self.__reset_channels_state()
         else:
             self.channel_one_state, self.channel_two_state = states
-        brigntess = await self.async_fetch_channel_brightness()
-        if not isinstance(brigntess, list):
-            self.__reset_channels_brighntess()
-        elif isinstance(brigntess, list) and len(brigntess) < 2:
-            self.__reset_channels_brighntess()
+        brightness = await self.async_fetch_channel_brightness()
+        if not isinstance(brightness, list):
+            self.__reset_channels_brightness()
+        elif isinstance(brightness, list) and len(brightness) < 2:
+            self.__reset_channels_brightness()
         else:
-            self.channel_one_brightness, self.channel_two_brightness = brigntess
+            self.channel_one_brightness, self.channel_two_brightness = brightness
