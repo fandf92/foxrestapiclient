@@ -15,8 +15,7 @@ class FoxR1S1Device(FoxBaseDevice):
 
     def __init__(self, device_data: DeviceData):
         """Initialize object by given device data."""
-        super().__init__(device_data.name, device_data.host, device_data.api_key,
-                        device_data.mac_addr, device_data.type)
+        super().__init__(device_data)
         self.__device_api_client = self.DeviceRestApiImplementer(self._rest_api_client)
         self.has_sensor_data = True
         self._state = False
@@ -124,3 +123,4 @@ class FoxR1S1Device(FoxBaseDevice):
         self._state = await self.async_fetch_channel_state()
         self.total_energy_data = await self.__device_api_client.async_fetch_total_energy_data()
         self.ac_parameters_data = await self.__device_api_client.async_fetch_ac_parameters_data()
+        self.__init_all_sensor_values()
