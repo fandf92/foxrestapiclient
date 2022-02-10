@@ -17,11 +17,12 @@ setup(
     author="F&F Filipowski Sp. j.",
     author_email="t.waclawiak@fif.com.pl",
     license="MIT",
-    url = "https://github.com/fandf92/foxrestapiclient",
+    url="https://github.com/fandf92/foxrestapiclient",
     packages=find_packages(exclude=("test")),
     include_package_data=True,
     install_requires=[
         'asyncio',
-        'aiohttp'
+        'aiohttp',
+        'requests'
     ],
 )
