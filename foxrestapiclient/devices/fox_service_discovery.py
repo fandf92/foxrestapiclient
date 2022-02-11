@@ -5,7 +5,7 @@ from typing import Tuple
 from foxrestapiclient.connection import _LOGGER
 
 from .const import (DEVICE_DISCOVERY_REQUEST_HEADER,
-                    DEVICE_DISCOVERY_RESPONSE_HEADER, DEVICES,
+                    DEVICE_DISCOVERY_RESPONSE_HEADER, DEVICE_TYPE_GATE, DEVICES,
                     MIN_DATA_SIZE_TO_PARSE)
 from .fox_base_device import DeviceData
 
@@ -96,6 +96,9 @@ class FoxServiceDiscovery:
             _LOGGER.warning("Response not indicate to F&F Fox device.")
             return
         device_type = int.from_bytes(data[42:44], "little")
+        #Gate is not supported yet
+        if device_type == DEVICE_TYPE_GATE:
+            return
         device_unique_id = data[36:42].hex()
         try:
             discovered_device = DeviceData(
