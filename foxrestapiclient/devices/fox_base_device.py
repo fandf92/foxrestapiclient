@@ -18,7 +18,7 @@ class DeviceData:
     """DeviceData holder. Used for simple object creation."""
 
     def __init__(self, name: str, host: str, api_key: str, mac_addr: str, dev_type: int,
-            channels: list = None):
+            channels: list = None, skip: bool = False):
         """Init all required values."""
         self.name = name
         self.host = host
@@ -26,6 +26,7 @@ class DeviceData:
         self.mac_addr = mac_addr
         self.dev_type = dev_type
         self.channels = channels
+        self.skip = skip
 
 class UnsupportedDevice(Exception):
     """Custom exception for unsupported device."""
