@@ -21,7 +21,7 @@ class FoxDIM1S2Device(FoxDimmableDevice):
         """Fetch all available data from device."""
         self.state = await self.async_fetch_channel_state()
         channel_brightness = await self.async_fetch_channel_brightness()
-        if isinstance(channel_brightness, list):
+        if isinstance(channel_brightness, list) and channel_brightness:
             self.brightness = channel_brightness[0]
         else:
             self.brightness = 0

@@ -18,7 +18,7 @@ class DeviceData:
     """DeviceData holder. Used for simple object creation."""
 
     def __init__(self, name: str, host: str, api_key: str, mac_addr: str, dev_type: int,
-            channels: list = None):
+            channels: list = None, skip: bool = False):
         """Init all required values."""
         self.name = name
         self.host = host
@@ -26,6 +26,7 @@ class DeviceData:
         self.mac_addr = mac_addr
         self.dev_type = dev_type
         self.channels = channels
+        self.skip = skip
 
 class UnsupportedDevice(Exception):
     """Custom exception for unsupported device."""
@@ -88,7 +89,7 @@ class FoxBaseDevice:
         """Return channel name or name."""
         if (self.device_info_data is None or (channel < 1 and channel > 2)):
             return self.name
-        if len(self.device_info_data.device_channels_name) > 1:
+        if len(self.device_info_data.device_channels_name) >= 1:
             return self.device_info_data.device_channels_name[channel-1]
         return self.name
 
@@ -185,7 +186,7 @@ class FoxBaseDevice:
         self.device_info_data = device_response
         #Overwrite device name from user app config
         if device_response.device_name is not None:
-            self.name = device_response.device_name
+            self.name = device_response.device_friendly_name
         return True
 
     async def async_fetch_device_available_data(self):
